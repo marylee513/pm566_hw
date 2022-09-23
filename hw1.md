@@ -545,8 +545,7 @@ ggplot(epa, aes(x=pm2.5mean, color=as.factor(Year))) +
   theme(legend.position="top")
 ```
 
-\[\](hw1_files/figure-gfm/Step 5: plots of “STATE_CODE”, “COUNTY_CODE”,
-“CBSA_NAME”-1.png)<!-- -->
+![](hw1_files/figure-gfm/Step%205:%20plots%20of%20STATE_CODE,%20COUNTY_CODE,%20CBSA_NAME-1.png)<!-- -->
 
 ``` r
 #if "as.factor" is not added, histogram will not differentiate colors based on Year, why and how to make Year into the right variable???
@@ -560,8 +559,7 @@ ggplot(epa, aes(x=COUNTY, y=pm2.5mean, color=as.factor(Year))) +
   geom_boxplot()
 ```
 
-\[\](hw1_files/figure-gfm/Step 5: plots of “STATE_CODE”, “COUNTY_CODE”,
-“CBSA_NAME”-2.png)<!-- -->
+![](hw1_files/figure-gfm/Step%205:%20plots%20of%20STATE_CODE,%20COUNTY_CODE,%20CBSA_NAME-2.png)<!-- -->
 
 ``` r
 #site in LA
@@ -573,8 +571,7 @@ ggplot(epa, aes(x=CBSA_NAME, y=pm2.5mean, color=as.factor(Year))) +
   geom_boxplot()
 ```
 
-\[\](hw1_files/figure-gfm/Step 5: plots of “STATE_CODE”, “COUNTY_CODE”,
-“CBSA_NAME”-3.png)<!-- -->
+![](hw1_files/figure-gfm/Step%205:%20plots%20of%20STATE_CODE,%20COUNTY_CODE,%20CBSA_NAME-3.png)<!-- -->
 
 Observation: State level: PM2.5 values are lower during 2019 compared to
 those in 2004, although this difference is not obviously shown in the
