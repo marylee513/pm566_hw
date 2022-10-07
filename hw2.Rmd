@@ -1,0 +1,221 @@
+---
+title: "pm566_hw2"
+author: "Yiping Li"
+output: github_document
+date: "`r Sys.Date()`" 
+always_allow_html: true
+---
+
+```{r, download file from github}
+library (readr)
+urlfile1="https://raw.githubusercontent.com/USCbiostats/data-science-data/master/01_chs/chs_individual.csv"
+individual <- read_csv(url(urlfile1))
+dim(individual)
+summary(individual)
+
+urlfile2="https://raw.githubusercontent.com/USCbiostats/data-science-data/master/01_chs/chs_regional.csv"
+regional <- read_csv(url(urlfile2))
+dim(regional)
+summary(regional)
+```
+
+```{r, Q1: merge two datasets, check for duplicates by counting the # of rows, check for missing values using the avg within the variable male and hispanic}
+hw2 <- merge(individual, regional)
+dim(hw2)
+head(hw2)
+tail(hw2)
+str(hw2)
+summary(hw2)
+
+library(skimr)
+skim(hw2)
+```
+
+The merged dataset has 1200 rows, which match the individual dataset, and 49 columns, which match the addition of rows in individual dataset and regional dataset. For variables of interest, there are 89 (7.4%) missing for BMI, 31 (2.6%) missing for asthma, 40 (3.3%) missing for smoke, 33 (2.8%) missing for gasstove. None of these missing values are greater than 10%, so we can continue analyzing this dataset. 
+
+```{r, Q2, create a new cat var; create a summary table w/ min BMI, max BMI, and total # of observations per category}
+library(dplyr)
+hw2 <- hw2 %>% 
+  filter(!is.na(bmi))
+
+hw2 <- hw2 %>%
+  mutate(obesity_level = bmi) 
+#if I do not filter NA in the above step but add na.rm=TRUE in mutate function, it does not filter NA values
+
+hw2$obesity_level <- cut(hw2$obesity_level,
+                             breaks=c(0, 14, 22, 24, Inf),
+                             labels=c("underweight", "normal", "overweight", "obese"))
+
+#wk5, slide page42
+tableQ2 <- hw2 %>%
+  group_by(obesity_level) %>%
+  summarise(
+    BMImin = min(bmi),
+    BMImax = max(bmi),
+    BMI_num = n()
+  ) 
+knitr::kable(tableQ2)
+
+#or tableQ2 <- hw2 %>% group_by() %>% knitr::kable()
+```
+
+```{r, Q3, create a new cat var w/ 4 cat categories}
+#second hand smoke + gas stove: both, neither, smoker only, stove only --> wk5 p13
+
+hw2 <- hw2 %>%
+  mutate(smoke_gas_exposure = factor(
+          case_when (smoke == 0 & gasstove == 0 ~ "none", 
+                     smoke == 0 & gasstove == 1 ~ "gasonly",
+                     smoke == 1 & gasstove == 0 ~ "smokeonly", 
+                     smoke == 1 & gasstove == 1 ~ "both")
+          ))
+
+hw2 <- hw2 %>% 
+  filter(!is.na(smoke_gas_exposure))
+
+table(hw2$smoke_gas_exposure)
+```
+
+```{r, Q4, create 4 summary table}
+tableQ4_1 <- hw2 %>%
+  group_by(townname) %>%
+  summarise(
+    fevavg = mean(fev, na.rm=TRUE),
+    fevsd = sd(fev, na.rm=TRUE),
+    asthmaavg = mean(asthma, na.rm=TRUE), 
+    asthmasd = sd(asthma, na.rm=TRUE)
+  )
+knitr::kable(tableQ4_1)
+
+tableQ4_2 <- hw2 %>%
+  group_by(male) %>%
+  summarise(
+    fevavg = mean(fev, na.rm=TRUE),
+    fevsd = sd(fev, na.rm=TRUE),
+    asthmaavg = mean(asthma, na.rm=TRUE), 
+    asthmasd = sd(asthma, na.rm=TRUE)
+  )
+knitr::kable(tableQ4_2)
+
+tableQ4_3 <- hw2 %>%
+  group_by(obesity_level) %>%
+  summarise(
+    fevavg = mean(fev, na.rm=TRUE),
+    fevsd = sd(fev, na.rm=TRUE),
+    asthmaavg = mean(asthma, na.rm=TRUE), 
+    asthmasd = sd(asthma, na.rm=TRUE)
+  )
+knitr::kable(tableQ4_3)
+
+tableQ4_4 <- hw2 %>%
+  group_by(smoke_gas_exposure) %>%
+  summarise(
+    fevavg = mean(fev, na.rm=TRUE),
+    fevsd = sd(fev, na.rm=TRUE),
+    asthmaavg = mean(asthma, na.rm=TRUE), 
+    asthmasd = sd(asthma, na.rm=TRUE)
+  )
+knitr::kable(tableQ4_4)
+```
+
+#EDA
+```{r, EDA, already check for missing values in the very first step}
+dim(hw2)
+head(hw2)
+tail(hw2)
+str(hw2)
+summary(hw2)
+```
+
+```{r, fig1, scatterplot, wk4 page29,16,46}
+library(ggplot2)
+hw2 %>%
+  ggplot(mapping = aes(x = bmi, y = fev, color = townname)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE, col = "black") + 
+  labs(title = "BMI vs FEV by town", x = "BMI", y = "FEV", fill = "town") +
+  facet_wrap(~townname, nrow = 3)
+
+#fill name was not changed
+```
+
+Fig1: FEV increases as BMI gets largers at all towns, so BMI might have an direct association with FEV. 
+
+```{r, fig2, stacked histogram}
+hw2 %>%
+  ggplot(aes(x = fev, fill = obesity_level)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title = "FEV by BMI cattegory", x = "FEV", fill = "obesity level")
+
+hw2 %>%
+  ggplot(aes(x = fev, fill = smoke_gas_exposure)) + 
+  geom_histogram(position = "identity", alpha = 0.5) +
+  labs(title = "FEV by smoke/gas exposure", x = "FEV", fill = "smoke/gas exposure")
+```
+
+Fig2.1 BMI vs. FEV by town:
+Based on the histogram, people who are underweight have lower FEV compared to people has normal weight or are overweight/obese. Compared to people who has normal weight, people at higher obesity levels (overweight and obese) tend to have higher FEV. It is likely that FEV is associated with obesity level. 
+
+Fig2.2 FEV by smoke/gas exposure: 
+According to the histogram, bell shape is observed for all obesity levels. Therefore, FEV might not be associated with smoke/gas exposure.
+
+```{r, fig3, barchart, http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualization}
+hw2 %>%
+  ggplot(aes(x = obesity_level, fill = smoke_gas_exposure)) +
+  geom_bar() +
+  labs(title = "BMI by smoke/gas exposure", x = "BMI", fill = "smoke/gas exposure")
+```
+
+Fig3: At all obesity levels, especially r=the normal weight category, the largest number of people are having only-gas exposure, so BMI might not be associated with smoke/gas exposure. 
+
+```{r, fig4, statistical summary graph, wk4 page37}
+hw2 %>%
+  ggplot() +
+  stat_summary(mapping = aes(x = obesity_level, y = fev),
+               fun.min = min,
+               fun.max = max, 
+               fun = median) + 
+  labs(title = "Statistical Summary of FEV by BMI category")
+
+hw2 %>%
+  ggplot() +
+  stat_summary(mapping = aes(x = smoke_gas_exposure, y = fev),
+               fun.min = min,
+               fun.max = max, 
+               fun = median) + 
+  labs(title = "Statistical Summary of FEV by smoke gas exposure")
+```
+
+Fig4.1, Statistical Summary of FEV by BMI category:
+FEV increases as BMI gets largers at all towns, so BMI might have an direct association with FEV. 
+
+Fig4.2, Statistical Summary of FEV by smoke gas exposure:
+There might be no association between FEV and smoke gas exposure.
+
+```{r, fig5, leaflet map, wk4 page53}
+library(leaflet)
+hw2.pal <- colorNumeric(c('darkgreen','goldenrod','brown'), domain=hw2$pm25_mass)
+
+leaflet() %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
+  addCircles(
+    data = hw2,
+    lat = ~lat, lng=~lon,
+    opacity = 1, fillOpacity = 1, radius = 400, color = ~ hw2.pal(hw2$pm25_mass)
+    ) %>%
+    addLegend('bottomleft', pal=hw2.pal, values=hw2$pm25_mass,
+          title='PM2.5', opacity=1)
+
+```
+
+Fig5: The highest PM2.5 level is close to Riverside. In addition, places such as Ontario and Long Beach also has pretty high concentration of Pm2.5. 
+
+```{r, fig6}
+hw2 %>%
+  ggplot(mapping = aes(x = pm25_mass, y = fev, color = townname)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE, col = "black") + 
+  labs(title = "PM2.5 vs FEV by town", x = "PM2.5", y = "FEV", fill = "town") 
+```
+
+Fig6: There is no obvious pattern showed in the scatterplot plot to show PM2.5 is associated with FEV, even though the regression line tends to that as PM2.5 increases, FEV decreases.
