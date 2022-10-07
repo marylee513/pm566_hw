@@ -159,7 +159,8 @@ Based on the histogram, people who are underweight have lower FEV compared to pe
 Fig2.2 FEV by smoke/gas exposure: 
 According to the histogram, bell shape is observed for all obesity levels. Therefore, FEV might not be associated with smoke/gas exposure.
 
-```{r, fig3, barchart, http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualization}
+```{r, fig3, barchart}
+#http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualization
 hw2 %>%
   ggplot(aes(x = obesity_level, fill = smoke_gas_exposure)) +
   geom_bar() +
