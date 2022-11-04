@@ -49,12 +49,12 @@ ids <- as.character(ids)
 
 # Find all the ids 
 ids <- stringr::str_extract_all(ids, 
-"<Id>[[:digit:]]+</Id")[[1]]
+"<Id>[[:digit:]]+</Id>")[[1]]
 
 # Remove all the leading and trailing <Id> </Id>. Make use of "|"
 ids <- stringr::str_remove_all(ids, "</?Id>")
 
-head(ids) #above step unable to remove </Id
+head(ids) #above step unable to remove </Id; another method "<Id>|</Id>" does not work as well
 length(ids)
 ```
 
@@ -62,12 +62,13 @@ A total of 4010 papers were found on Pubmed, and a total of 1083 papers were fou
 
 Question2: using the list of pubmed ids you retrieved, download each papers’ details using the query parameter rettype = abstract. If you get more than 250 ids, just keep the first 250.
 ```{r}
+ids <- ids[1:250]
 publications <- GET(
   url   = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
   query = list(
     db='pubmed',
     id=paste(ids,collapse =','),
-    retmax=250,
+    retmax=5000,
     rettype='abstract'
     )
 )
