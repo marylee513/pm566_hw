@@ -72,7 +72,7 @@ ids <- stringr::str_extract_all(ids,
 # Remove all the leading and trailing <Id> </Id>. Make use of "|"
 ids <- stringr::str_remove_all(ids, "</?Id>")
 
-head(ids) #above step unable to remove </Id; another method "<Id>|</Id>" does not work as well
+head(ids)
 ```
 
     ## [1] "36328399" "36327352" "36322837" "36320825" "36314847" "36307830"
@@ -143,10 +143,6 @@ dates <- str_remove_all(dates, "</?[[:alnum:]]+>")
 dates <- str_replace_all(dates, "[[:space:]]+"," ")
 
 #Finally the dataset:
-length(ids) <- length(abstracts) 
-#I added this because if I dont, the next step wont run, giving error: Error in data.frame(PubMedId = ids, Title = titles, Journal = journals,  : arguments imply differing number of rows: 1803, 2
-#But still, the output looks wrong
-
 database <- data.frame(
   PubMedId = ids,
   Title    = titles,
