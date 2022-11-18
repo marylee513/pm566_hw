@@ -1,4 +1,4 @@
-hw4
+pm566_hw4
 ================
 Yiping Li
 2022-11-17
@@ -52,9 +52,9 @@ microbenchmark::microbenchmark(
 ```
 
     ## Unit: microseconds
-    ##          expr     min       lq      mean  median      uq      max neval
-    ##     fun1(dat) 367.302 385.2505 426.71126 395.146 428.799  899.041   100
-    ##  fun1alt(dat)  35.292  35.7020  49.03884  36.402  37.781 1014.542   100
+    ##          expr     min       lq      mean   median       uq      max neval
+    ##     fun1(dat) 342.782 416.6475 567.11713 462.4775 700.7005 1322.584   100
+    ##  fun1alt(dat)  35.215  36.2550  55.41161  39.8515  48.0815 1058.343   100
 
 ``` r
 # Test for the second
@@ -65,9 +65,9 @@ microbenchmark::microbenchmark(
 ```
 
     ## Unit: microseconds
-    ##          expr      min        lq     mean   median       uq      max neval
-    ##     fun2(dat) 2008.640 2086.7285 2248.773 2145.959 2287.872  3744.25   100
-    ##  fun2alt(dat)  571.749  894.6055 1343.487  947.579 1086.318 21191.47   100
+    ##          expr      min       lq     mean    median       uq       max neval
+    ##     fun2(dat) 2018.534 2090.403 2282.745 2159.5745 2344.702  4182.442   100
+    ##  fun2alt(dat)  550.590  848.618 1340.587  943.2225 1095.048 18665.561   100
 
 ``` r
 #get rid off unit = "relative" due to error
@@ -104,7 +104,7 @@ system.time({
     ## [1] 3.14124
 
     ##    user  system elapsed 
-    ##   3.204   0.986   4.291
+    ##   3.183   0.932   4.295
 
 Rewrite the previous code using parLapply() to make it run faster. Make
 sure you set the seed using clusterSetRNGStream():
@@ -127,7 +127,7 @@ system.time({
     ## [1] 3.141578
 
     ##    user  system elapsed 
-    ##   0.004   0.001   2.520
+    ##   0.005   0.001   1.895
 
 \#SQL Setup a temporary database by running the following chunk
 
